@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <style>
+        *{ margin: 0; padding: 0;}
+        body{ overflow: hidden;}
+        .bg{ background: url("img/slider_index_02.jpg") no-repeat top center; background-size: 100% 100%; height: 100%; filter: blur(8px); }
+        .c1{ display: block; margin: 0 auto; position: absolute; left: 50%; top: 30px; margin-left: -600px;}
+    </style>
+    <script src="jquery-2.2.4.js"></script>
+    <script>
+        $(function() {
+            // 整体高度100%
+            $("body").css({
+                height: window.screen.height
+            });
+            
+            // 加载小联盟商标图
+            var brandImage = new Image();
+            brandImage.src = "img/logo_en_2x.png";
+            brandImage.onload = function() {
+                // 启动粒子效果
+                startUpParticle({
+                    // 图片对象
+                    oImg: this,
+                    // x轴偏移
+                    dx: 0,
+                    // y轴偏移
+                    dy: 0,
+                    // 放大倍数
+                    enlargeNum: 5,
+                    // 粒子边长(正方形粒子)或半径(圆形粒子)
+                    radius: 4,
+                    // canvas对象(jquery对象)
+                    $cvs: $("#c1")
+                });
+            };
+
+            function startUpParticle(config) {
+                var oImg = config.oImg;
+                var dx = config.dx;
+                var dy = config.dy;
+                var enlargeNum = config.enlargeNum;
+                var radius = config.radius;
+                var $cvs = config.$cvs;
+
+                var cvsw = parseInt($cvs.attr("width"));
+                var cvsh = parseInt($cvs.attr("height"));
+
+                var oCvsC = $cvs.get(0).getContext("2d");
+                var w = oImg.width;
+                var h = oImg.height;
+
+                oCvsC.globalAlpha = 1;
+                oCvsC.drawImage(oImg, 0, 0, w, h, 0, 0, w, h);
+
+                var imageData = oCvsC.getImageData(0, 0, w, h);
+                oCvsC.clearRect(0, 0, cvsw, cvsh);
+
+                // 原始像素点
+                var aOrg = [];
+                // 运动像素点
+                var aMove = [];
+                // 定时器每触发一次，生成越来越多的运动像素点，次数变量
+                var movePixelTimes = 0;
+
+                // 收集原始像素点
+                for(var i=0; i<imageData.width; i++){
+                    for(var j=0; j<imageData.height; j++){
+                        var color = getXY( imageData , i , j );
+                        if( color[3] > 250 ){
+                            aOrg.push([i, j]);
+                        }
+                    }
+                }
+
+                // 打乱顺序，一会儿出现的时候就可以随机出现了
+                aOrg.sort(function(n1, n2) {
+                    return Math.random() - 0.5;
+                });
+
+                var timer2 = setInterval(function() {
+                    oCvsC.clearRect(0, 0, cvsw, cvsh);
+                    for(var i = 0; i < aMove.length; i++) {
+                        oCvsC.fillStyle = "#fff";
+                        oCvsC.beginPath();
+                        oCvsC.globalAlpha = aMove[i].a / 100;
+                        oCvsC.fillRect(aMove[i].x, aMove[i].y, aMove[i].r, aMove[i].r);
+                        oCvsC.closePath();
+                        oCvsC.fill();
+                    }
+
+                    for(var i = 0; i < Math.min(aMove.length, aOrg.length); i++) {
+                        startMove(aMove[i], {
+                            x: aOrg[i][0] * enlargeNum + dx,
+                            y: aOrg[i][1] * enlargeNum + dy,
+                            r: radius,
+                            a: 100
+                        });
+                    }
+                }, 10);
+
+                // 每隔一段时间，生成一部分
+                var timer1 = setInterval(function() {
+                    movePixelTimes++;
+                    for(var i = 0; i < movePixelTimes; i++) {
+                        aMove.push({
+                            x: Math.floor(Math.random() * cvsw),
+                            y: Math.floor(Math.random() * cvsh),
+                            r: 100,
+                            a: 0
+                        });
+                        // 如果生成的像素点已经超过原始像素点数量，就停下来
+                        if (aMove.length >= aOrg.length) {
+                            clearInterval(timer1);
+                            setTimeout(function() {
+                                clearInterval(timer2);
+                            }, 2000);
+                        }
+                    }
+                }, 100);
+            }
+
+            function getXY(obj,x,y){		
+                var data = obj.data;
+                var w = obj.width;
+                var h = obj.height;
+                
+                var color = [];
+                color[0] = data[ 4*(w*y+x) ];
+                color[1] = data[ 4*(w*y+x) + 1 ];
+                color[2] = data[ 4*(w*y+x) + 2 ];
+                color[3] = data[ 4*(w*y+x) + 3 ];
+                
+                return color;                
+            }
+
+            function startMove(obj,json){				
+				for(var attr in json){					
+					var iSpeed = (json[attr] - obj[attr])/6;
+					iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed);					
+					obj[attr] += iSpeed;					
+				}				
+			}
+        });
+    </script>
+</head>
+<body>
+    <div class="bg">
+    </div>
+    <div class="content">        
+        <canvas class="c1" id="c1" width="1200" height="300"></canvas>
+    </div>
+</body>
+</html>

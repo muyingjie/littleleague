@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>canvas像素级操作、粒子运动思想 - 妙味课堂 - www.miaov.com</title>
+<style>
+*{ margin:0; padding:0;}
+#div1{ width:1000px; height:600px; margin:20px auto;}
+#c1{ background: #eee;}
+</style>
+<script>
+window.onload = function(){
+	
+	loadImgs([
+		'miao.png','wei.png','ke.png','tang.png','miaov.png',
+	], function (imgs){
+		
+		var iNow = 0;
+		
+		show(imgs[iNow],250,50,25,10);
+		
+		
+		function show(yImg,dx,dy,iN,iR){
+			
+			var oC = document.getElementById('c1');
+			var oGC = oC.getContext('2d');
+			
+			var w = yImg.width;
+			var h = yImg.height;
+			
+			oGC.globalAlpha = 1;
+			oGC.drawImage(yImg , 0, 0, w, h, oC.width/2-w/4, oC.height/2-h/4, w/2, h/2);
+			
+			var imageData = oGC.getImageData(oC.width/2-w/4, oC.height/2-h/4, w/2, h/2);
+			
+			oGC.clearRect(0,0,oC.width,oC.height);
+			
+			var arr = [];
+			var iNum = 0;
+			
+			for(var i=0;i<imageData.height;i++){
+				for(var j=0;j<imageData.width;j++){
+					
+					var color = getXY( imageData , j , i );
+					
+					if( color[3] > 128 ){
+						
+						arr.push([j,i]);
+					}
+					
+				}
+			}
+			
+			arr.sort(function(num1,num2){
+				return Math.random() - 0.5;
+			});
+			
+			var timer3 = setInterval(function(){
+				
+				oGC.clearRect(0,0,oC.width,oC.height);
+				for(var i=0;i<allBall.length;i++){
+					oGC.fillStyle = 'red';
+					oGC.beginPath();
+					oGC.globalAlpha = allBall[i].a/100;
+					oGC.arc(allBall[i].x,allBall[i].y,allBall[i].r,0,360*Math.PI/180,false);
+					oGC.closePath();
+					oGC.fill();
+				}
+				
+			},30);
+			
+			
+			var allBall = [];
+			
+			setTimeout(function(){
+				
+				if(iNow != imgs.length-1){
+					
+					for(var i=0;i<arr.length;i++){
+					
+						allBall.push({
+							x : Math.floor(Math.random()*oC.width),
+							y : Math.floor(Math.random()*oC.height),
+							r : Math.floor(Math.random()*100),
+							a : 0
+						});
+						
+					}
+					
+					for(var i=0;i<allBall.length;i++){
+						startMove2(allBall[i],{x:arr[i][0]*iN+dx,y:arr[i][1]*iN+dy,r:iR,a:100});
+					}
+					
+					setTimeout(function(){
+						var bBtn = true;
+						
+						for(var i=0;i<allBall.length;i++){
+								startMove2(allBall[i],{x:Math.floor(Math.random()*oC.width),y:Math.floor(Math.random()*oC.height),r:Math.floor(Math.random()*100),a:0},function(){
+									
+									if(bBtn){
+										bBtn = false;
+									
+										iNow++;
+										clearInterval(timer3);
+										if(iNow == imgs.length-1){
+											show(imgs[iNow],70,50,14,6);
+										}
+										else{
+											show(imgs[iNow],250,50,25,10);
+										}
+									
+									}
+									
+								});
+						}
+						
+					},2000);
+					
+				}
+				else{
+					var timer1 = setInterval(function(){
+						
+						for(var i=0;i<Math.min(allBall.length,arr.length);i++){
+							startMove(allBall[i],{x:arr[i][0]*iN+dx,y:arr[i][1]*iN+dy,r:iR,a:100});
+						}
+						
+					},30);
+					
+					var timer2 = setInterval(function(){
+				
+						iNum++;
+						
+						for(var i=0;i<iNum;i++){
+							
+							allBall.push({
+								x : Math.floor(Math.random()*oC.width),
+								y : Math.floor(Math.random()*oC.height),
+								r : 100,
+								a : 0
+							});
+							
+						}
+						
+						if(allBall.length >= arr.length){
+							clearInterval(timer2);
+							setTimeout(function(){
+						
+								clearInterval(timer1);
+							
+							},2000);
+						}
+				
+					},100);
+					
+				}
+				
+			},1000);
+			
+			function startMove(obj,json){
+				
+				for(var attr in json){
+					
+					var iSpeed = (json[attr] - obj[attr])/6;
+					iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed);
+					
+					obj[attr] += iSpeed;
+					
+				}
+				
+			}
+			
+			function startMove2(obj,json,fn){
+				
+				clearInterval(obj.timer);
+				obj.timer = setInterval(function(){
+					
+					var bBtn = true;
+					
+					for(var attr in json){
+					
+						var iSpeed = (json[attr] - obj[attr])/8;
+						iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed);
+						
+						obj[attr] += iSpeed;
+						
+						if( obj[attr] != json[attr] ){
+							bBtn = false;
+						}
+						
+					}
+					
+					if(bBtn){
+						clearInterval(obj.timer);
+						if(fn){
+							fn();
+						}
+					}
+					
+				},30);
+				
+			}
+			
+		}
+		
+	});
+	
+	
+	function loadImgs(arr, fnSucc){
+		
+		var loaded = 0;
+		var result = [];
+	
+		for(var i=0;i<arr.length;i++){
+			
+			loads( arr[i] );		
+		}
+		
+		function loads(oImg){
+			var yImg = new Image();
+			
+			yImg.src = oImg;
+			
+			yImg.onload = function(){
+			
+				loaded++;
+				result.push( yImg );	
+				
+				if( loaded == arr.length ){
+					fnSucc(result);
+				}
+				
+				
+				
+			};
+			
+		}
+		
+	}
+	
+	function getXY(obj,x,y){
+		
+		var data = obj.data;
+		var w = obj.width;
+		var h = obj.height;
+		
+		var color = [];
+		color[0] = data[ 4*(w*y+x) ];
+		color[1] = data[ 4*(w*y+x) + 1 ];
+		color[2] = data[ 4*(w*y+x) + 2 ];
+		color[3] = data[ 4*(w*y+x) + 3 ];
+		
+		return color;
+		
+	}
+	
+	function setXY(obj,x,y,color){
+		
+		var data = obj.data;
+		var w = obj.width;
+		var h = obj.height;
+		
+		data[ 4*(w*y+x) ] = color[0];
+		data[ 4*(w*y+x) + 1 ] = color[1];
+		data[ 4*(w*y+x) + 2 ] = color[2];
+		data[ 4*(w*y+x) + 3 ] = color[3];
+		
+	}
+	
+};
+</script>
+</head>
+
+<body>
+<div id="div1">
+	<canvas id="c1" width="1000" height="600"></canvas>
+</div>
+</body>
+</html>
