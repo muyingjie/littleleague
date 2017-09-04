@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <style>
+        *{ margin: 0; padding: 0;}
+        a{ text-decoration: none; color: #fff;}
+        body{ overflow: hidden;}
+
+        .bg{ width: 100%; height: 100%; position: absolute; left: 0; top: 0;}
+        .bg-baseball{ background: url("img/slider_index_02.jpg") no-repeat top center; background-size: 100% 100%; z-index: 1;}
+        .bg-black{ background: #1f1f1f; z-index: 2;}
+        .bg-black .little-league,.bg-black .little-league-cvs{ width: 818px; height: 133px; position: absolute; left: 50%; top: 50%; margin-left: -414px; margin-top: -66px;}
+        .bg-black .little-league{ background: url("img/littleleague2.png");}
+        .bg-black .little-league-cvs{}
+    </style>
+    <script src="jquery-2.2.4.js"></script>
+    <script>
+        $(function(){
+            // 整体高度100%
+            $("body").css({
+                height: window.screen.height
+            });
+
+            // 擦除
+            // var p = [
+            //     [50, 0], [0, 100],
+            //     [100, 0], [50, 100],
+            //     [150, 0], [100, 100]
+            // ];
+            var aPoints = [];
+            for(var i = 0; i < 30; i++) {
+                aPoints.push([50 * (i + 1), 0], [50 * i, 100]);
+            }
+            
+            var $llcvs = $(".little-league-cvs");
+            var llw = $llcvs.attr("width");
+            var llh = $llcvs.attr("height");
+            var llctx = $llcvs.get(0).getContext("2d");
+            var eraseIndex = 0;
+
+            llctx.fillStyle = "#1f1f1f";
+            llctx.fillRect(0, 0, llw, llh);
+
+            llctx.lineCap = "round";
+            llctx.lineJoin = "round";
+            llctx.lineWidth = 30;
+            llctx.globalCompositeOperation = "destination-out";
+
+            var eraseTimer = setInterval(function() {
+                if (!aPoints[eraseIndex + 1]) {
+                    clearInterval(eraseTimer);
+                    return;
+                }
+                var startpx = aPoints[eraseIndex][0];
+                var startpy = aPoints[eraseIndex][1];
+                var endpx = aPoints[eraseIndex + 1][0];
+                var endpy = aPoints[eraseIndex + 1][1];
+                llctx.save();
+                llctx.beginPath();
+                llctx.arc(startpx, startpy, 15, 0, 2 * Math.PI);
+                llctx.fill();
+                llctx.restore();
+
+                llctx.save();
+                llctx.moveTo(startpx, startpy);
+                llctx.strokeStyle = "#ccc";
+                var innerTimer = setInterval(function(){
+                    if (!aPoints[eraseIndex + 1]) {
+                        clearInterval(eraseTimer);
+                        return;
+                    }
+                    if (eraseIndex % 2 == 0) {
+                        startpx -= 2;
+                        startpy += 4;
+                        llctx.moveTo(startpx, startpy);
+                        llctx.lineTo(endpx, endpy);
+                        llctx.stroke();
+                    } else {
+                        startpx += 4;
+                        startpy -= 4;
+                        llctx.moveTo(startpx, startpy);
+                        llctx.lineTo(endpx, endpy);
+                        llctx.stroke();
+                    }
+                }, 30);
+                llctx.restore();
+
+                eraseIndex++;
+            }, 100);
+        });
+    </script>
+</head>
+<body>
+    <div class="bg bg-baseball">
+    </div>
+    <div class="bg bg-black">
+        <div class="little-league"></div>
+        <canvas class="little-league-cvs" width="818" height="133"></canvas>
+    </div>
+</body>
+</html>
