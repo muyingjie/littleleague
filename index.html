@@ -93,7 +93,7 @@
                 // 运动像素点
                 var aMove = [];
                 // 定时器每触发一次，生成越来越多的运动像素点，次数变量
-                var movePixelTimes = 200;
+                var movePixelTimes = 30;
 
                 // 收集原始像素点
                 for(var i=0; i<imageData.width; i++){
@@ -134,10 +134,15 @@
                 // 每隔一段时间，生成一部分
                 var timer1 = setInterval(function() {
                     movePixelTimes++;
+                    var rndx;
+                    var rndy;
                     for(var i = 0; i < movePixelTimes; i++) {
+                        rndx = Math.floor(-cvsw + Math.random() * (3 * cvsw));
+                        rndy = Math.floor(-cvsh + Math.random() * (3 * cvsh));
+                        console.log(rndx, rndy);
                         aMove.push({
-                            x: Math.floor(Math.random() * cvsw),
-                            y: Math.floor(Math.random() * cvsh),
+                            x: rndx,
+                            y: rndy,
                             r: 100,
                             a: 0
                         });
