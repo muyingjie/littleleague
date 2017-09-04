@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>test</title>
+    <style>
+      *{ margin: 0; padding: 0;}
+      a{ text-decoration: none; color: #fff;}
+      .btn{ width: 100px; height: 40px; background: #3385ff; border-radius: 3px; text-align: center; line-height: 40px; color: #fff;}
+      .txt{ font-size: 40px; font-weight: bold; position: absolute; left: -1000px; transition: 1.4s cubic-bezier(0.360, 0.000, 0.435, 1.460);}
+      .start-fill-form{ position: absolute; left: 50%; top: 200px; margin-left: -50px; animation: start infinite 5s; box-shadow: 0 0 50px 10px #3385ff;}
+      @keyframes start{
+          0%      { box-shadow: 0 0 50px 10px #3385ff;}
+          50%     { box-shadow: 0 0 50px 30px #3385ff;}
+          100%    { box-shadow: 0 0 50px 10px #3385ff;}
+      }
+    </style>
+    </style>
+    <script src="jquery-2.2.4.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        var $txt = $(".txt")
+        var txtw = $txt.width();
+        var txtl = Math.abs(parseInt($txt.css("left")));
+        var screenw = document.documentElement.clientWidth;
+        var dstL = screenw / 2 - txtw / 2;
+
+        $txt.css({
+           transform: "translateX(" + (txtl + dstL) + "px)"
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="txt">
+      仅需三步，查询排名
+    </div>
+
+    <a href="javascript:;" class="btn start-fill-form">开始</a>
+  </body>
+</html>

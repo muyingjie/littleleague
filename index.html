@@ -5,18 +5,44 @@
     <title>index</title>
     <style>
         *{ margin: 0; padding: 0;}
+        a{ text-decoration: none; color: #fff;}
         body{ overflow: hidden;}
+
+        .btn{ width: 100px; height: 40px; background: #3385ff; border-radius: 3px; text-align: center; line-height: 40px; color: #fff;}
+
         .bg{ background: url("img/slider_index_02.jpg") no-repeat top center; background-size: 100% 100%; height: 100%; filter: blur(8px); }
-        .c1{ display: block; margin: 0 auto; position: absolute; left: 50%; top: 30px; margin-left: -600px;}
+        .content .c1{ display: block; margin: 0 auto; position: absolute; left: 50%; top: 30px; margin-left: -600px;}
+        .content .prompt{ height: 60px; line-height: 60px; font-size: 40px; font-weight: bold; color: #fff; position: absolute; left: -1000px; transition: 1.4s cubic-bezier(0.360, 0.000, 0.435, 1.460);}
+        .content .prompt:nth-of-type(1){ top: 430px;}
+        .content .prompt:nth-of-type(2){ top: 490px;}
+
+        .content .start-fill-form{ position: absolute; left: 50%; top: 650px; margin-left: -50px; opacity: 0; animation: start infinite 6s; box-shadow: 0 0 50px 10px #3385ff;}
+        @keyframes start{
+            0%      { box-shadow: 0 0 50px 10px #3385ff;}
+            50%     { box-shadow: 0 0 50px 24px #3385ff;}
+            100%    { box-shadow: 0 0 50px 10px #3385ff;}
+        }
     </style>
     <script src="jquery-2.2.4.js"></script>
     <script>
         $(function() {
+            var $txt = $(".prompt")
+            var txtw = $txt.width();
+            var txtl = Math.abs(parseInt($txt.css("left")));
+            var screenw = document.documentElement.clientWidth;
+            var dstL = screenw / 2 - txtw / 2;
+            // 提示文字要分别出现，获取所有提示的长度以确定终止索引
+            var stopIndex = $txt.length;
+            // 提示文字的开始位置索引
+            var moveIndex = 0;
+            // 开始填写表单按钮
+            var $startFillForm = $(".start-fill-form");
+
             // 整体高度100%
             $("body").css({
                 height: window.screen.height
             });
-            
+
             // 加载小联盟商标图
             var brandImage = new Image();
             brandImage.src = "img/logo_en_2x.png";
@@ -36,6 +62,9 @@
                     // canvas对象(jquery对象)
                     $cvs: $("#c1")
                 });
+
+                showPrompt(showStartInputBtn);
+                
             };
 
             function startUpParticle(config) {
@@ -64,7 +93,7 @@
                 // 运动像素点
                 var aMove = [];
                 // 定时器每触发一次，生成越来越多的运动像素点，次数变量
-                var movePixelTimes = 0;
+                var movePixelTimes = 200;
 
                 // 收集原始像素点
                 for(var i=0; i<imageData.width; i++){
@@ -100,7 +129,7 @@
                             a: 100
                         });
                     }
-                }, 10);
+                }, 30);
 
                 // 每隔一段时间，生成一部分
                 var timer1 = setInterval(function() {
@@ -123,35 +152,58 @@
                 }, 100);
             }
 
-            function getXY(obj,x,y){		
+            function getXY(obj,x,y){
                 var data = obj.data;
                 var w = obj.width;
                 var h = obj.height;
-                
+
                 var color = [];
                 color[0] = data[ 4*(w*y+x) ];
                 color[1] = data[ 4*(w*y+x) + 1 ];
                 color[2] = data[ 4*(w*y+x) + 2 ];
                 color[3] = data[ 4*(w*y+x) + 3 ];
-                
-                return color;                
+
+                return color;
             }
 
-            function startMove(obj,json){				
-				for(var attr in json){					
-					var iSpeed = (json[attr] - obj[attr])/6;
-					iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed);					
-					obj[attr] += iSpeed;					
-				}				
-			}
+            function startMove(obj,json){
+                for(var attr in json){
+                    var iSpeed = (json[attr] - obj[attr])/6;
+                    iSpeed = iSpeed > 0 ? Math.ceil(iSpeed) : Math.floor(iSpeed);
+                    obj[attr] += iSpeed;
+                }
+            }
+            
+            function showPrompt(fn) {
+                var timer = setInterval(function() {
+                    $txt.eq(moveIndex).css({
+                        transform: "translateX(" + (txtl + dstL) + "px)"
+                    });
+                    moveIndex++;
+                    // 所有提示文字都已经出现过
+                    if (moveIndex == stopIndex) {
+                        clearInterval(timer);
+                        fn && fn();
+                    }
+                }, 400);
+            }
+
+            function showStartInputBtn() {
+                $startFillForm.animate({
+                    opacity: 1
+                }, 2000);
+            }
         });
     </script>
 </head>
 <body>
     <div class="bg">
     </div>
-    <div class="content">        
+    <div class="content">
         <canvas class="c1" id="c1" width="1200" height="300"></canvas>
+        <div class="prompt">仅需三步简单操作</div>
+        <div class="prompt">方便获取您的排名</div>
+        <a href="javascript:;" class="btn start-fill-form">开始</a>
     </div>
 </body>
 </html>
