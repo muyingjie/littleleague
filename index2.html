@@ -30,7 +30,7 @@
             //     [150, 0], [100, 100]
             // ];
             var aPoints = [];
-            for(var i = 0; i < 30; i++) {
+            for(var i = 0; i < 2; i++) {
                 aPoints.push([50 * (i + 1), 0], [50 * i, 100]);
             }
             
@@ -46,6 +46,7 @@
             llctx.lineCap = "round";
             llctx.lineJoin = "round";
             llctx.lineWidth = 30;
+            llctx.strokeStyle = "#ccc";
             llctx.globalCompositeOperation = "destination-out";
 
             var eraseTimer = setInterval(function() {
@@ -61,34 +62,33 @@
                 llctx.beginPath();
                 llctx.arc(startpx, startpy, 15, 0, 2 * Math.PI);
                 llctx.fill();
-                llctx.restore();
-
-                llctx.save();
-                llctx.moveTo(startpx, startpy);
-                llctx.strokeStyle = "#ccc";
                 var innerTimer = setInterval(function(){
-                    if (!aPoints[eraseIndex + 1]) {
-                        clearInterval(eraseTimer);
-                        return;
-                    }
+                    llctx.moveTo(startpx, startpy);
                     if (eraseIndex % 2 == 0) {
                         startpx -= 2;
-                        startpy += 4;
-                        llctx.moveTo(startpx, startpy);
-                        llctx.lineTo(endpx, endpy);
-                        llctx.stroke();
+                        startpy += 4;console.log(startpx, startpy);
+                        if (Math.abs(startpx - endpx) <= 2 && Math.abs(startpy - endpy) <= 4) {
+                            llctx.lineTo(endpx, endpy);
+                            clearInterval(innerTimer);
+                        } else {
+                            llctx.lineTo(startpx, startpy);
+                        }
                     } else {
                         startpx += 4;
                         startpy -= 4;
-                        llctx.moveTo(startpx, startpy);
-                        llctx.lineTo(endpx, endpy);
-                        llctx.stroke();
+                        if (Math.abs(startpx - endpx) <= 4 && Math.abs(startpy - endpy) <= 4) {
+                            llctx.lineTo(startpx, startpy);
+                            clearInterval(innerTimer);
+                        } else {
+                            llctx.lineTo(endpx, endpy);
+                        }
                     }
-                }, 30);
+                    llctx.stroke();
+                }, 10);
                 llctx.restore();
 
                 eraseIndex++;
-            }, 100);
+            }, 1000);
         });
     </script>
 </head>

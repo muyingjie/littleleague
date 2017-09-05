@@ -14,7 +14,7 @@
           50%     { box-shadow: 0 0 50px 30px #3385ff;}
           100%    { box-shadow: 0 0 50px 10px #3385ff;}
       }
-    </style>
+      #cvs{ width: 1000px; height: 400px;}
     </style>
     <script src="jquery-2.2.4.js"></script>
     <script type="text/javascript">
@@ -26,16 +26,86 @@
         var dstL = screenw / 2 - txtw / 2;
 
         $txt.css({
-           transform: "translateX(" + (txtl + dstL) + "px)"
+          transform: "translateX(" + (txtl + dstL) + "px)"
         });
+
+        var $cvs = $("#cvs");
+        var cvsctx = $cvs.get(0).getContext("2d");
+        var cvsw = $cvs.attr("width");
+        var cvsh = $cvs.attr("height");
+
+        // 生成随机位置数组
+        var aRndPos = createRndPositions(40, cvsw - 200, cvsh);
+
+        cvsctx.fillStyle = "#ccc";
+        cvsctx.fillRect(0, 0, cvsw, cvsh);
+
+        cvsctx.lineCap = "milter";
+        cvsctx.lineJoin = "milter";
+        cvsctx.lineWidth = 40;
+        cvsctx.globalCompositeOperation = "destination-out";
+
+        cvsctx.save();
+        cvsctx.beginPath();
+        // $.each(aRndPos, function(i, pos) {
+        //   cvsctx[i == 0 ? "moveTo" : "lineTo"](pos[0], pos[1]);
+        // });
+        var eraseIndex = 0;
+        cvsctx.moveTo(aRndPos[eraseIndex][0], aRndPos[eraseIndex][1]);
+        var eraseTimer = setInterval(function() {
+          eraseIndex++;
+          if (eraseIndex >= aRndPos.length - 1) {
+            clearInterval(eraseTimer);
+            return;
+          }
+          var startp = aRndPos[eraseIndex];
+          var endp = aRndPos[eraseIndex + 1];
+          var curAnimateTime = 0;
+          // 运动次数，不能按速度运动，因为水平和垂直方向速度不均衡
+          var animateTimes = 20;
+          var startpx = startp[0];
+          var startpy = startp[1];
+          var endpx = endp[0];
+          var endpy = endp[1];
+          var speedx = (endpx - startpx) / animateTimes;
+          var speedy = (endpy - startpy) / animateTimes;
+          var innerInterval = setInterval(function(){
+            curAnimateTime++;
+            if (curAnimateTime == 20) {
+              clearInterval(innerInterval);
+              return;
+            }
+            cvsctx.lineTo(startpx + speedx * curAnimateTime, startpy + speedy * curAnimateTime);
+            cvsctx.stroke();
+          }, 30);          
+        }, 600);
+        cvsctx.restore();
+
+        // 参数：
+        // dis：点与点之间的距离
+        // xWaveMax：水平方向波动最大范围
+        // yWaveMax：垂直方向波动最大范围
+        function createRndPositions(dis, xWaveMax, yWaveMax) {
+          var length = parseInt(xWaveMax / dis);
+          var arr = [];
+          for(var i = 0; i < length; i++) {
+            arr.push(
+              [dis * (i + 1) + 100, Math.floor(Math.random() * yWaveMax / 4)],
+              [dis * i + 100, Math.floor(3 * yWaveMax / 4 + Math.random() * yWaveMax / 4)]
+            );
+          }
+          return arr;
+        }
       });
     </script>
   </head>
   <body>
-    <div class="txt">
+    <!--<div class="txt">
       仅需三步，查询排名
     </div>
 
-    <a href="javascript:;" class="btn start-fill-form">开始</a>
+    <a href="javascript:;" class="btn start-fill-form">开始</a>-->
+
+    <canvas id="cvs" width="1200" height="400"></canvas>
   </body>
 </html>
