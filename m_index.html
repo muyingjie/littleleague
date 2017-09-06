@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        @media only screen and (min-width: 640px){ html{ font-size: 62.5%; }}
+        @media only screen and (max-width: 640px) and (min-width: 580px){ html{ font-size: 62.5%; }}
+        @media only screen and (max-width:580px) and (min-width: 440px){ html{ font-size: 54%; }}
+        @media only screen and (max-width:440px) and (min-width: 400px){ html{ font-size: 46%; }}
+        @media only screen and (max-width:440px) and (min-width: 400px){ html{ font-size: 42%; }}
+        @media only screen and (max-width:400px) and (min-width: 360px){ html{ font-size: 40%; }}
+        @media only screen and (max-width:400px) and (min-width: 360px){ html{ font-size: 32%; }}
+
+        *{ margin: 0; padding: 0; text-decoration: none; list-style: none; font-family: 黑体;}
+        body{ background: #e6e6ee;}
+        .fl{ float: left;}
+        .clear:after{ clear: both; content: ""; display: block;}
+
+        .header{ height: 26rem; background: #000; color: #fff;}
+        .header .title{ font-size: 3.4rem; line-height: 20rem; height: 20rem; text-align: center;}
+        .header .cate{}
+        .header .cate .item{ width: 25%;}
+        .header .cate .item a{ display: block; height: 6rem; line-height: 6rem; font-size: 2.4rem; text-align: center; color: #585a59; }
+        .header .cate .item a.active{ color: #fff;}
+
+        .bar{ height: 7rem; line-height: 7rem; padding-left: 2rem; font-size: 2.6rem;}
+        .radar{ height: 40rem; background: #fff; font-size: 2.6rem;}
+        .radar .left{ padding-left: 2rem;}
+        .radar .left .t{ height: 6rem; line-height: 6rem; padding-left: 2.5rem;}
+        .radar .left .data-wrap{ width: 18rem;}
+        .radar .left .data-wrap .item{ width: 50%; padding: 1rem 2rem; box-sizing: border-box;}
+        .radar .left .data-wrap .item .num{ height: 5rem; line-height: 5rem; color: #000000; text-align: center; font-size: 2.4rem;}
+        .radar .left .data-wrap .item .txt{ height: 3rem; line-height: 3rem; color: #dddee0; text-align: center; font-size: 2rem;}
+    </style>
+    <script src="jquery-2.2.4.js"></script>
+    <script src="echarts.js"></script>
+    <script>
+        $(function(){
+            
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="title">风来了</div>
+        <ul class="cate">
+            <li class="item fl"><a href="javascript:;">综合统计</a></li>
+            <li class="item fl"><a href="javascript:;" class="active">我的成绩</a></li>
+            <li class="item fl"><a href="javascript:;">最高纪录</a></li>
+            <li class="item fl"><a href="javascript:;">队友对手</a></li>
+        </ul>
+    </div>
+    <div class="bar">雷达图</div>
+    <div class="radar">
+        <div class="left">
+            <div class="t">全部比赛(500)</div>
+            <div class="data-wrap clear">
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+                <div class="item fl">
+                    <div class="num">30.9</div>
+                    <div class="txt">综合</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
