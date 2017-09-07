@@ -30,11 +30,11 @@
         .header .cate .item a.active{ color: #fff;}
 
         .bar{ height: 7rem; line-height: 7rem; padding-left: 2rem; font-size: 2.6rem;}
-        .radar{ height: 40rem; background: #fff; font-size: 2.6rem;}
+        .radar{ height: 40rem; background: #fff; font-size: 2.6rem; position: relative;}
         .radar .left{ padding-left: 2rem;}
         .radar .left .t{ height: 6rem; line-height: 6rem; padding-left: 2.5rem;}
         .radar .left .data-wrap{ width: 18rem;}
-        .radar .left .data-wrap .item{ width: 50%; padding: 1rem 2rem; box-sizing: border-box; transition: .5s; position: relative; left: -100%;}
+        .radar .left .data-wrap .item{ width: 50%; padding: 1rem 2rem; box-sizing: border-box; transition: 1s; position: relative; left: -100%;}
         .radar .left .data-wrap .item .num{ height: 5rem; line-height: 5rem; color: #000000; text-align: center; font-size: 2.4rem;}
         .radar .left .data-wrap .item .txt{ height: 3rem; line-height: 3rem; color: #dddee0; text-align: center; font-size: 2rem;}
         .radar .chart{ width: calc(100% - 22rem); height: 100%;}
@@ -43,16 +43,28 @@
     <script src="echarts.js"></script>
     <script>
         $(function(){
-            var myChart = echarts.init($(".chart").get(0));
+            var $radarDataItem = $(".radar .data-wrap .item");
+            var radarDataItemLen = $radarDataItem.length;
+            var $chart = $(".chart");
+            var myChart = echarts.init($chart.get(0));
+
+            // 数据生成
+            var radarDataSource = [];
+            for (var i = 0; i < 4; i++) {
+                radarDataSource.push([]);
+                for (var j = 0; j < 6; j++) {
+                    radarDataSource[0].push(Math.floor(50 + Math.random() * 100));
+                }
+            }
             var option = {
                 radar: {
                     indicator: [
                         { name: '综合', max: 150 },
                         { name: 'KDA', max: 150 },
                         { name: '发育', max: 150 },
-                        { name: '生成', max: 120 },
-                        { name: '推进', max: 108 },
-                        { name: '输出', max: 72 }
+                        { name: '生成', max: 150 },
+                        { name: '推进', max: 150 },
+                        { name: '输出', max: 150 }
                     ],
                     startAngle: 0
                 },
@@ -81,48 +93,28 @@
                                         color: "#c74642"
                                     }
                                 }
-                            },
-                            {
-                                value: [90, 113, 140, 30, 70, 60],
-                                lineStyle: {
-                                    normal: {
-                                        color: "#2f4554"
-                                    }
-                                },
-                                areaStyle: {
-                                    normal: {
-                                        color: "#2f4554"
-                                    }
-                                }
                             }
                         ]
                     }
                 ]
             };
-            myChart.setOption(option);
+            
 
-            var $radarDataItem = $(".radar .data-wrap .item");
-            var radarDataItemLen = $radarDataItem.length;
-            var radarDataItemIndex = 0;
-            var timer = setInterval(function() {
-                $radarDataItem.eq(radarDataItemIndex).css({"transform": "translateX(200%)"});
-                radarDataItemIndex++;
-                if (radarDataItemIndex == radarDataItemLen) {
-                    clearInterval(timer);
-                }
-            }, 100);
+            // 进场动画
+            enterAnimate();
+            function enterAnimate() {
+                var radarDataItemIndex = 0;
+                var timer = setInterval(function() {
+                    $radarDataItem.eq(radarDataItemIndex).css({"transform": "translateX(200%)"});
+                    radarDataItemIndex++;
+                    if (radarDataItemIndex == radarDataItemLen) {
+                        clearInterval(timer);
+                    }
+                }, 100);
 
-            function numIncrease(dst, base) {
-                var sdst = dst + "";
-                var aDst = sdst.split(".");
-                // 小数进到个位1位时需要多少步
-                var digitCycle = Math.pow(10, aDst[1].length);
-                // 个位每位增长耗时
-                var speed = 100;
-
-                setInterval(function() {
-                    setInterval(function() {}, speed / digitCycle);
-                }, speed);
+                $radarDataItem.eq(radarDataItemLen - 1).on("transitionend", function() {
+                    myChart.setOption(option);
+                });
             }
         });
     </script>
@@ -143,34 +135,32 @@
             <div class="t">全部比赛(500)</div>
             <div class="data-wrap clear">
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
                 <div class="item fl">
-                    <div class="num">30.9</div>
+                    <div class="num">0</div>
                     <div class="txt">综合</div>
                 </div>
             </div>
         </div>
-        <div class="chart fl">
-
-        </div>
+        <div class="chart fl"></div>
     </div>
 </body>
 </html>
