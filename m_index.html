@@ -38,23 +38,37 @@
         .radar .left .data-wrap .item .num{ height: 5rem; line-height: 5rem; color: #000000; text-align: center; font-size: 2.4rem;}
         .radar .left .data-wrap .item .txt{ height: 3rem; line-height: 3rem; color: #dddee0; text-align: center; font-size: 2rem;}
         .radar .chart{ width: calc(100% - 22rem); height: 100%;}
+
+        .line{ height: 38rem; background: #fff; margin-bottom: 3rem;}
     </style>
     <script src="jquery-2.2.4.js"></script>
     <script src="echarts.js"></script>
     <script>
         $(function(){
+            var $headerCateItem = $(".header .cate .item a");
             var $radarDataItem = $(".radar .data-wrap .item");
             var radarDataItemLen = $radarDataItem.length;
             var $chart = $(".chart");
+            var $line = $(".line");
             var myChart = echarts.init($chart.get(0));
+            var myLine = echarts.init($line.get(0));
 
             // 数据生成
             var radarDataSource = [];
             for (var i = 0; i < 4; i++) {
                 radarDataSource.push([]);
                 for (var j = 0; j < 6; j++) {
-                    radarDataSource[0].push(Math.floor(50 + Math.random() * 100));
+                    radarDataSource[i].push(Math.floor(50 + Math.random() * 100));
                 }
+            }
+
+            // 折线数据
+            var lineDataSource = [];
+            for (var i = -100; i < 0; i++) {
+                lineDataSource.push({
+                    x: Date.now() + i * 24 * 60 * 60 * 1000,
+                    y: Math.floor(10 + Math.random() * 90)
+                });
             }
             var option = {
                 radar: {
@@ -98,14 +112,93 @@
                     }
                 ]
             };
-            
+            var lineOption = {
+                xAxis: {
+                    data: lineDataSource.map(function (item){
+                        return getDateTxt(item.x, "yyyy-MM-dd");
+                    })
+                },
+                yAxis: {
+                    splitLine: {
+                        show: false
+                    }
+                },
+                dataZoom: [{
+                    startValue: "2017-08-01"
+                }, {
+                    type: "inside"
+                }],
+                visualMap: {
+                    top: 10,
+                    right: 10,
+                    pieces: [{
+                        gt: 0,
+                        lte: 20,
+                        color: '#00f'
+                    }, {
+                        gt: 20,
+                        lte: 40,
+                        color: '#00d'
+                    }, {
+                        gt: 40,
+                        lte: 60,
+                        color: '#00a'
+                    }, {
+                        gt: 60,
+                        lte: 80,
+                        color: '#008'
+                    }, {
+                        gt: 80,
+                        lte: 100,
+                        color: '#006'
+                    }],
+                    outOfRange: {
+                        color: '#003'
+                    }
+                },
+                series: {
+                    type: "line",
+                    data: lineDataSource.map(function (item){
+                        return item.y;
+                    }),
+                    markLine: {
+                        silent: true,
+                        data: [{
+                            yAxis: 20
+                        }, {
+                            yAxis: 40
+                        }, {
+                            yAxis: 60
+                        }, {
+                            yAxis: 80
+                        }]
+                    }
+                }
+            };
+            myLine.setOption(lineOption);
 
-            // 进场动画
-            enterAnimate();
-            function enterAnimate() {
+            // $headerCateItem.click(showEnter);
+
+            // 页面刚上来时模拟一次点击
+            showEnter.call($headerCateItem.eq(1));
+
+            function showEnter() {
+                var curTabIndex = $(this).parent().index();
+
+                option.series[0].data[0].value = radarDataSource[curTabIndex];
+
+                enterAnimate(curTabIndex);
+            }
+
+            // 进场动画            
+            function enterAnimate(curTabIndex) {
+                $radarDataItem.each(function(i, oR) {
+                    $(oR).find(".num").html(radarDataSource[curTabIndex][i]);
+                });
+
                 var radarDataItemIndex = 0;
                 var timer = setInterval(function() {
-                    $radarDataItem.eq(radarDataItemIndex).css({"transform": "translateX(200%)"});
+                    $radarDataItem.eq(radarDataItemIndex).css({"left": "0"});
                     radarDataItemIndex++;
                     if (radarDataItemIndex == radarDataItemLen) {
                         clearInterval(timer);
@@ -115,6 +208,28 @@
                 $radarDataItem.eq(radarDataItemLen - 1).on("transitionend", function() {
                     myChart.setOption(option);
                 });
+            }
+
+            function getDateTxt(ts, fmt) {
+                var oDate = new Date(ts);
+                var o = {
+                    "M+": oDate.getMonth() + 1, //月份
+                    "d+": oDate.getDate(), //日
+                    "h+": oDate.getHours(), //小时
+                    "m+": oDate.getMinutes(), //分
+                    "s+": oDate.getSeconds(), //秒
+                    "q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
+                    "S": oDate.getMilliseconds() //毫秒
+                };
+                if (/(y+)/.test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+                }
+                for (var k in o) {
+                    if (new RegExp("(" + k + ")").test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                    }
+                }
+                return fmt;
             }
         });
     </script>
@@ -140,27 +255,29 @@
                 </div>
                 <div class="item fl">
                     <div class="num">0</div>
-                    <div class="txt">综合</div>
+                    <div class="txt">KDA</div>
                 </div>
                 <div class="item fl">
                     <div class="num">0</div>
-                    <div class="txt">综合</div>
+                    <div class="txt">发育</div>
                 </div>
                 <div class="item fl">
                     <div class="num">0</div>
-                    <div class="txt">综合</div>
+                    <div class="txt">生成</div>
                 </div>
                 <div class="item fl">
                     <div class="num">0</div>
-                    <div class="txt">综合</div>
+                    <div class="txt">推进</div>
                 </div>
                 <div class="item fl">
                     <div class="num">0</div>
-                    <div class="txt">综合</div>
+                    <div class="txt">输出</div>
                 </div>
             </div>
         </div>
         <div class="chart fl"></div>
     </div>
+    <div class="bar">胜率趋势图</div>
+    <div class="line"></div>
 </body>
 </html>
