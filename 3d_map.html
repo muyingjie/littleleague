@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="jquery-2.2.4.js"></script>
+    <script src="echarts.js"></script>
+    <script src="echarts-gl-release1-beta4.js"></script>
+    <script>
+        $(function() {
+            var $map_3d = $("#map_3d");
+            var my_map_3d = echarts.init($map_3d.get(0));
+            var option = {
+                geo: {
+                    map: "china",
+                    itemStyle: {					// 定义样式
+                        normal: {					// 普通状态下的样式
+                            areaColor: '#323c48',
+                            borderColor: '#111'
+                        },
+                        emphasis: {					// 高亮状态下的样式
+                            areaColor: '#2a333d'
+                        }
+                    },
+                    backgroundColor: '#404a59',
+                    series: [
+                        {
+                            name: '销量', // series名称
+                            type: 'scatter', // series图表类型
+                            coordinateSystem: 'geo', // series坐标系类型
+                            data: [
+                                {name: '海门', value: [121.15, 31.89, 90]},
+                                {name: '鄂尔多斯', value: [109.781327, 39.608266, 120]},
+                                {name: '招远', value: [120.38, 37.35, 142]},
+                                {name: '舟山', value: [122.207216, 29.985295, 123]}
+                            ],
+                        }
+                    ]
+                }
+            };
+            $.ajax({
+                url: "/littleleague/china.json",
+                method: "get",
+                success: function(data) {
+                    echarts.registerMap("china", data);
+                    my_map_3d.setOption(option);                    
+                },
+                fail: function() {
+                    console.log(arguments);
+                }
+            });
+        });
+    </script>
+</head>
+<body style="background: #333;">
+    <div id="map_3d" style="height: 800px;"></div>
+</body>
+</html>
