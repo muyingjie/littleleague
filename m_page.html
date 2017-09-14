@@ -17,6 +17,7 @@
         @media only screen and (max-width:440px) and (min-width: 400px){ html{ font-size: 42%; }}
         @media only screen and (max-width:400px) and (min-width: 360px){ html{ font-size: 40%; }}
         @media only screen and (max-width:400px) and (min-width: 360px){ html{ font-size: 32%; }}
+        /*设置font-size: 62.5%之后就有1rem = 10px*/
         *{ margin: 0; padding: 0; list-style: none; color: #F2F2F2;}
         /* Custom CSS
 		 * --------------------------------------- */
@@ -38,6 +39,47 @@
 		/* Section 2
 		 * --------------------------------------- */
 		#section1{}
+        #section1 .input-wrap{ background: #444; width: 70%; margin: 0 auto; perspective: 80rem;}
+        #section1 .input-wrap .form-wrap{ position: relative;}
+        #section1 .input-wrap .form-wrap .form-item{ position: absolute; top: 4rem; transform-style: preserve-3d; transform-origin: top; transform: rotateX(-120deg);}
+        #section1 .input-wrap .spec-wrap{ width: 16rem; height: 4rem; transition: 1s;}
+        #section1 .open{ transform:rotateX(0deg); animation:1.5s open ease-in;}
+        #section1 .close{ transform:rotateX(-120deg); animation:0.7s clos ease;}
+
+        @keyframes open{
+            0%
+            {
+                transform:rotateX(-120deg);
+            }
+            25%
+            {
+                transform:rotateX(30deg);
+            }
+            50%
+            {
+                transform:rotateX(-15deg);
+            }
+            75%
+            {
+                transform:rotateX(8deg);
+                box-shadow:inset 0 0 0 0 #ccc;
+            }
+            100%
+            {
+                transform:rotateX(0deg);
+            }
+        }
+        @keyframes close
+        {
+            0%
+            {
+                transform:rotateX(0deg);
+            }
+            100%
+            {
+                transform:rotateX(-120deg);
+            }
+        }
 		/* Section 3
 		 * --------------------------------------- */
 		#section2{}
@@ -71,6 +113,63 @@
                 });
             }
 
+            function secondPage() {
+                // 生成DOM结构
+                var data = [
+                    {
+                        name: "姓名"
+                    },{
+                        name: "性别"}
+                    // },{
+                    //     name: "出生年月"
+                    // },{
+                    //     name: "身高"
+                    // }, {
+                    //     name: "体重"
+                    // }, {
+                    //     name: "坐位体前屈"
+                    // }, {
+                    //     name: "50米"
+                    // }, {
+                    //     name: "立定跳远"
+                    // }
+                ];
+                $("#section1 .form-wrap").append(
+                    createFormDom(data)
+                );
+                var $specWrap = $(".form-wrap .form-item");
+                var i = 0;
+                var oTimer = setInterval(function(){
+					$specWrap.eq(i).addClass("open");
+					if(i == $specWrap.length-1)
+					{
+						clearInterval(oTimer);
+					}
+					i++;
+			    }, 200);
+
+            }
+
+            function createFormDom(data, $item) {
+                var toBeAddedData;
+                var $next;
+
+                if (!data || data.length == 0) {
+                    return $item;
+                } else if (data.length >= 1) {
+                    $item = $item ? $item : $("<div>").addClass("form-item");
+                    toBeAddedData = data.shift();
+
+                    $item.append(
+                        $("<div>").addClass("spec-wrap").html(toBeAddedData.name)
+                    ).append(
+                        $next = $("<div>").addClass("form-item")
+                    );
+                    createFormDom(data, $next)
+                    return $next;
+                }
+            }
+
             function animatePace($dst, oItems) {
                 var innerDef = $.Deferred();
                 $dst.css(oItems).on("transitionend", function() {
@@ -80,6 +179,7 @@
             }
 
             window.firstPage = firstPage;
+            window.secondPage = secondPage;
 
             var $fullpage = $('#fullpage');
             $fullpage.fullpage({
@@ -105,7 +205,10 @@
             <button class="start">start test</button>
         </div>
         <div class="section" id="section1">
-            2
+            <div class="input-wrap">
+                <h3>请输入信息</h3>
+                <div class="form-wrap"></div>
+            </div>
         </div>
         <div class="section" id="section2">
             3
