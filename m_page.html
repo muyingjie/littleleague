@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta http-equiv="pragma" content="no-cache">
     <title>m_page</title>
-    <link rel="stylesheet" href="javascript.fullPage.css">
+    <link rel="stylesheet" href="jquery.fullPage.css">
     <style>
         @media only screen and (min-width: 640px){ html{ font-size: 62.5%; }}
         @media only screen and (max-width: 640px) and (min-width: 580px){ html{ font-size: 62.5%; }}
@@ -28,8 +28,8 @@
 		/* Section 1
 		 * --------------------------------------- */
 		#section0{}
-        #section0 h1{ width: 100%; font-size: 6rem; font-weight: bold; text-align: center; line-height: 8rem; position: absolute; left: 0; top: 50%; margin-top: -5rem; opacity: 0; transition: .5s;}
-        #section0 .start{ width: 8rem; height: 4rem; background: red; border: none; border-radius: 3px; font-size: 2rem; position: absolute; left: 50%; bottom: 30%; margin-left: -4rem; box-shadow: 0 0 50px 10px red; animation: start 4s infinite linear; opacity: 0; }
+        #section0 .title{ width: 100%; font-size: 6rem; font-weight: bold; text-align: center; line-height: 8rem; position: absolute; left: 0; top: 50%; margin-top: -5rem; opacity: 0; transition: 1s;}
+        #section0 .start{ width: 12rem; height: 5rem; background: red; border: none; border-radius: 3px; font-size: 2rem; position: absolute; left: 50%; bottom: 30%; margin-left: -6rem; box-shadow: 0 0 50px 10px red; animation: start 4s infinite linear; opacity: 0; transition: 1s; }
         @keyframes start{
             0%      { box-shadow: 0 0 50px 10px red;}
             50%     { box-shadow: 0 0 50px 24px red;}
@@ -42,43 +42,59 @@
 		 * --------------------------------------- */
 		#section2{}
     </style>
-    <script src="javascript.fullPage.min.js"></script>
     <script src="jquery-2.2.4.js"></script>
+    <script src="jquery.fullPage.js"></script>
     <script src="echarts.js"></script>
     <script>
         $(function() {
-            fullpage.initialize('#fullpage', {
+            function firstPage() {
+                var def = $.Deferred();
+                var $title = $("#section0 .title");
+                var $start = $("#section0 .start");
+                def.then(function() {
+                    return animatePace($title, {
+                        opacity: 1
+                    });
+                }).then(function() {
+                    return animatePace($title, {
+                        top: "30%"
+                    });
+                }).then(function() {
+                    return animatePace($start, {
+                        opacity: 1
+                    });
+                });
+                def.resolve();
+
+                $start.on("click", function() {
+                    $.fn.fullpage.moveSectionDown();
+                });
+            }
+
+            function animatePace($dst, oItems) {
+                var innerDef = $.Deferred();
+                $dst.css(oItems).on("transitionend", function() {
+                    innerDef.resolve();
+                });;
+                return innerDef;
+            }
+
+            window.firstPage = firstPage;
+
+            var $fullpage = $('#fullpage');
+            $fullpage.fullpage({
                 anchors: ['firstPage', 'secondPage', 'lastPage'],
-                menu: '#menu',
-                css3:true
+                css3:true,
+                afterLoad: function(anchor) {
+                    if (!anchor) {
+                        anchor = "firstPage";
+                        $.fn.fullpage.moveTo('firstPage');
+                    }
+                    setTimeout(function() {
+                        window[anchor]();
+                    }, 10);                    
+                }
             });
-
-            var $setion = $("#section0");
-
-            $.queue($setion, "fx", function() {
-                var _this = this;
-                $(this).find(".title").animate({
-                    opacity: 1
-                }, 1000, function() {
-                    $.dequeue(_this);
-                });
-            });
-            
-            $.queue($setion, "fx", function() {
-                var _this = this;
-                $(this).find(".title").animate({
-                    top: "30%"
-                }, 1500, function() {
-                    $.dequeue(_this);
-                });
-            });
-            $.queue($setion, "fx", function() {
-                $(this).find(".start").animate({
-                    opacity: 1
-                });
-            });
-
-            $.dequeue($setion, "fx");
         });
     </script>
 </head>
