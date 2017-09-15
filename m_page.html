@@ -39,50 +39,60 @@
 		/* Section 2
 		 * --------------------------------------- */
 		#section1{}
-        #section1 .input-wrap{ background: #444; width: 70%; margin: 0 auto; perspective: 80rem;}
+        #section1 .input-wrap{ background: #444; width: 70%; margin: 0 auto; perspective: 80rem; text-align: center; padding: 2rem; border-radius: 1rem;}
         #section1 .input-wrap .form-wrap{ position: relative;}
-        #section1 .input-wrap .form-wrap .form-item{ position: absolute; top: 4rem; transform-style: preserve-3d; transform-origin: top; transform: rotateX(-120deg);}
-        #section1 .input-wrap .spec-wrap{ width: 16rem; height: 4rem; transition: 1s;}
-        #section1 .open{ transform:rotateX(0deg); animation:1.5s open ease-in;}
-        #section1 .close{ transform:rotateX(-120deg); animation:0.7s clos ease;}
+        #section1 .input-wrap .form-wrap .form-item{ position: absolute; top: 7rem; transform-style: preserve-3d; transform-origin: top; width: 100%;}
+        #section1 .input-wrap .form-wrap .form-item.start-deg{ transform: rotateX(-90deg);}
+        #section1 .input-wrap .spec-wrap{ height: 7rem; vertical-align: middle; width: 100%;}
+        #section1 .input-wrap .spec-wrap .l-name,#section1 .input-wrap .spec-wrap .m-input,#section1 .input-wrap .spec-wrap .r-unit{ display: inline-block; vertical-align: middle;}
+        #section1 .input-wrap .spec-wrap .l-name{ width: 16rem; line-height: 7rem; text-align: left;}
+        #section1 .input-wrap .spec-wrap .m-input{ width: calc(100% - 19rem); height: 5rem; font-size: 2rem; border: none; background: #666; outline: none; padding-left: 2rem; box-sizing: border-box;}
+        #section1 .input-wrap .spec-wrap .r-unit{ width: 3rem;}
+        #section1 .open{ transform: rotateX(0deg); animation: 1.5s open ease-in;}
+        #section1 .swipe-down{ width: 5rem; height: 3rem; background: url("arrow_up.png") no-repeat; position: absolute; left: 50%; bottom: 2rem; margin-left: -2.5rem; animation: 1s swipe-down ease-in infinite; }
+        /*#section1 .fp-tableCell{ vertical-align: top;}*/
 
         @keyframes open{
-            0%
-            {
-                transform:rotateX(-120deg);
+            0% {
+                transform:rotateX(-90deg);
             }
-            25%
-            {
+            25% {
                 transform:rotateX(30deg);
             }
-            50%
-            {
+            50% {
                 transform:rotateX(-15deg);
             }
-            75%
-            {
+            75% {
                 transform:rotateX(8deg);
-                box-shadow:inset 0 0 0 0 #ccc;
             }
-            100%
-            {
+            100% {
                 transform:rotateX(0deg);
             }
         }
-        @keyframes close
-        {
-            0%
-            {
-                transform:rotateX(0deg);
+
+        @keyframes swipe-down {
+            0%,30% {
+                opacity: 0;
+                transform: translate(0,10px)
             }
-            100%
-            {
-                transform:rotateX(-120deg);
+            60% {
+                opacity: 1;
+                transform: translate(0,0)
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0,-8px)
             }
         }
 		/* Section 3
 		 * --------------------------------------- */
 		#section2{}
+        #section2 .res-wrap{ width: 90%; height: 40%; background: #444; margin: 2rem auto; padding: 2rem; box-sizing: border-box;}
+        #section2 .res-wrap .res-title{ height: 6rem; line-height: 6rem; font-size: 4rem; text-align: center;}
+        #section2 .res-wrap .res-chart{ height: calc(100% - 6rem);}
+        #section2 .height-res-wrap{ width: 90%; height: 50%; background: #444; margin: auto;}
+        #section2 .height-res-wrap .height-chart{ width: 100%; height: 100%; padding: 2rem; box-sizing: border-box;}
+        #section2 .fp-tableCell{ vertical-align: top;}
     </style>
     <script src="jquery-2.2.4.js"></script>
     <script src="jquery.fullPage.js"></script>
@@ -115,55 +125,138 @@
 
             function secondPage() {
                 // 生成DOM结构
-                var data = [
-                    {
+                // 待解决bug：创建出来的结构为何少一项？
+                var data = [{},{
                         name: "姓名"
                     },{
-                        name: "性别"}
-                    // },{
-                    //     name: "出生年月"
-                    // },{
-                    //     name: "身高"
-                    // }, {
-                    //     name: "体重"
-                    // }, {
-                    //     name: "坐位体前屈"
-                    // }, {
-                    //     name: "50米"
-                    // }, {
-                    //     name: "立定跳远"
-                    // }
+                        name: "性别"
+                    },{
+                        name: "出生年月"
+                    },{
+                        name: "身高",
+                        unit: "cm"
+                    }, {
+                        name: "体重",
+                        unit: "kg"
+                    }, {
+                        name: "坐位体前屈",
+                        unit: "cm"
+                    }, {
+                        name: "50米",
+                        unit: "s"
+                    }, {
+                        name: "立定跳远",
+                        unit: "m"
+                    }
                 ];
+                var copyDom = createFormDom(JSON.parse(JSON.stringify(data)));
                 $("#section1 .form-wrap").append(
-                    createFormDom(data)
-                );
-                var $specWrap = $(".form-wrap .form-item");
-                var i = 0;
-                var oTimer = setInterval(function(){
-					$specWrap.eq(i).addClass("open");
-					if(i == $specWrap.length-1)
-					{
-						clearInterval(oTimer);
-					}
-					i++;
-			    }, 200);
+                    copyDom
+                ).css({
+                    height: data.length * parseInt($("#section1").find(".spec-wrap").eq(0).css("height"))
+                });
+                $("#section1 .input-wrap").show(500, function() {
+                    var $specWrap = $(".form-wrap .form-item");
+                    var i = 0;
+                    var oTimer = setInterval(function(){
+                        $specWrap.eq(i).addClass("open").removeClass("start-deg");
+                        if(i == $specWrap.length-1)
+                        {
+                            clearInterval(oTimer);
+                        }
+                        i++;
+                    }, 200);
+                });                
+            }
 
+            function thirdPage() {
+                var $resChart = $("#section2 .res-chart");
+                var aYData = ['BMI', '坐位体前屈', '50米', '立定跳远'];
+                var aResData = [];
+                var aYAxisData = [];
+                var option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    xAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            color: "#fff"
+                        },
+                        boundaryGap: [0, 0.01]
+                    },
+                    yAxis: {
+                        type: 'category',
+                        axisLabel: {
+                            color: "#fff"
+                        },
+                        data: aYData
+                    },
+                    label: {
+                        normal: {
+                            show: true,
+                            position: "insideRight"
+                        }
+                    },
+                    series: [
+                        {
+                            type: "bar",
+                            barWidth: "30%",
+                            itemStyle: {
+                                normal: {
+                                    color: {
+                                        type: 'linear',
+                                        x: 0,
+                                        y: 0,
+                                        x2: 1,
+                                        y2: 0,
+                                        colorStops: [{
+                                            offset: 0, color: 'yellow' // 0% 处的颜色
+                                        }, {
+                                            offset: 1, color: 'red' // 100% 处的颜色
+                                        }],
+                                        globalCoord: true // 缺省为 false
+                                    }
+                                }
+                            },
+                            data: aResData
+                        }
+                    ]
+                };
+                $.each(aYData, function(i, yd) {
+                    aResData.push(Math.floor(Math.random() * 100));
+                });
+                
+                var resChart = echarts.init($resChart.get(0));
+                resChart.setOption(option);
             }
 
             function createFormDom(data, $item) {
                 var toBeAddedData;
                 var $next;
+                var $org;
 
                 if (!data || data.length == 0) {
-                    return $item;
+                    return $org;
                 } else if (data.length >= 1) {
-                    $item = $item ? $item : $("<div>").addClass("form-item");
+                    $item = $item ? $item : ($org = $("<div>").addClass("form-item start-deg"));
                     toBeAddedData = data.shift();
 
                     $item.append(
-                        $("<div>").addClass("spec-wrap").html(toBeAddedData.name)
+                        $("<div>").addClass("spec-wrap").append(
+                            $("<div>").addClass("l-name").html(toBeAddedData.name)
+                        ).append(
+                            $("<input>").addClass("m-input").attr({
+                                type: "text"
+                            })
+                        ).append(
+                            $("<div>").addClass("r-unit").html(toBeAddedData.unit ? toBeAddedData.unit : "")
+                        )
                     ).append(
-                        $next = $("<div>").addClass("form-item")
+                        $next = $("<div>").addClass("form-item start-deg")
                     );
                     createFormDom(data, $next)
                     return $next;
@@ -180,18 +273,24 @@
 
             window.firstPage = firstPage;
             window.secondPage = secondPage;
+            window.thirdPage = thirdPage;
 
             var $fullpage = $('#fullpage');
+            var hasLoadedSection = {};
             $fullpage.fullpage({
-                anchors: ['firstPage', 'secondPage', 'lastPage'],
+                anchors: ['firstPage', 'secondPage', 'thirdPage'],
                 css3:true,
                 afterLoad: function(anchor) {
                     if (!anchor) {
                         anchor = "firstPage";
                         $.fn.fullpage.moveTo('firstPage');
                     }
+                    if (hasLoadedSection[anchor]) {
+                        return;
+                    }
                     setTimeout(function() {
                         window[anchor]();
+                        hasLoadedSection[anchor] = true;
                     }, 10);                    
                 }
             });
@@ -205,13 +304,21 @@
             <button class="start">start test</button>
         </div>
         <div class="section" id="section1">
-            <div class="input-wrap">
-                <h3>请输入信息</h3>
+            <!-- 需要先将这里隐藏，等动态算出高度之后再显示，否则会跳一下 -->
+            <div class="input-wrap" style="display: none;">
+                <h3>请输入您的信息</h3>
                 <div class="form-wrap"></div>
             </div>
+            <div class="swipe-down"></div>
         </div>
         <div class="section" id="section2">
-            3
+            <div class="res-wrap">
+                <div class="res-title">您的各项得分</div>
+                <div class="res-chart"></div>
+            </div>
+            <div class="height-res-wrap">
+                <div class="height-chart"></div>
+            </div>
         </div>
     </div>
 </body>
